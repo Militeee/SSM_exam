@@ -1,0 +1,188 @@
+---
+title: "Anlysis_fitness_landscape"
+author: "Salvatore Milite"
+date: "7/8/2020"
+output: html_document
+---
+
+
+
+```{r  data_prep}
+
+drugs <-  c("AMP","AM","CEC","CTX","ZOX","CXM","CRO",
+"AMC","CAZ","CTT","SAM","CPR","CPD","TZP","FEP")
+
+states <-  c(
+"0000","1000","0100","0010",
+"0001","1100","1010","1001",
+"0110","0101","0011","1110",
+"1101","1011","0111","1111")
+
+data <- list(
+  c(0.001850833,0.001570000,0.002024167,0.001948333,0.002081667,0.002185833,0.000050800,0.002165000,0.002032500,0.002197500,0.002434167,0.000087500,0.002321667,0.000082500,0.000034200,0.002820833),
+  c(0.001777500,0.001720000,0.001448333,0.002041667,0.001781667,0.001556667,0.001799167,0.002008333,0.001184167,0.001544167,0.001751667,0.001767500,0.002246667,0.002005000,0.000062500,0.002046667),
+  c(0.002258333,0.000234167,0.002395833,0.002150833,0.001995833,0.002150000,0.002241667,0.000171667,0.002230000,0.001845833,0.002647500,0.002640000,0.000095000,0.000093300,0.000214167,0.000515833),
+  c(0.000160000,0.000185000,0.001653333,0.001935833,0.000085000,0.000225000,0.001969167,0.000140000,0.002295000,0.000137500,0.002347500,0.000119167,0.000091700,0.000203333,0.002269167,0.002411667),
+  c(0.000993333,0.001105833,0.001697500,0.002069167,0.000805000,0.001115833,0.001894167,0.001170833,0.002137500,0.002010000,0.002682500,0.001103333,0.001105000,0.000680833,0.002688333,0.002590833),
+  c(0.001747500,0.000422500,0.002940000,0.002070000,0.001700000,0.002024167,0.001910833,0.001578333,0.002918333,0.002173333,0.001937500,0.001590833,0.001677500,0.002754167,0.003271667,0.002923333),
+  c(0.001091667,0.000830000,0.002880000,0.002554167,0.000286667,0.001406667,0.003172500,0.000540000,0.002731667,0.000655833,0.003041667,0.002740000,0.000750833,0.001152500,0.000435833,0.003226667),
+  c(0.001435000,0.001416667,0.001671667,0.001060833,0.001573333,0.001376667,0.001537500,0.001350833,0.000073300,0.001625000,0.001456667,0.001306667,0.001914167,0.001590000,0.000067500,0.001727500),
+  c(0.002134167,0.000288333,0.002041667,0.002618333,0.002655833,0.002630000,0.001604167,0.000575833,0.002924167,0.002755833,0.002687500,0.002893333,0.002676667,0.001378333,0.000250833,0.002562500),
+  c(0.002125000,0.003238333,0.003290833,0.002804167,0.001921667,0.000545833,0.002882500,0.002965833,0.003081667,0.002887500,0.000587500,0.003192500,0.003180833,0.000890000,0.003507500,0.002543333),
+  c(0.001879167,0.002197500,0.002455833,0.000133333,0.002532500,0.002504167,0.002308333,0.002570000,0.000083300,0.002436667,0.000094200,0.002528333,0.003001667,0.002885833,0.000094200,0.003453333),
+  c(0.001743333,0.001553333,0.002017500,0.001762500,0.001661667,0.000222500,0.000165000,0.000255833,0.002041667,0.002050000,0.001785000,0.001810833,0.000239167,0.000220833,0.000217500,0.000288333),
+  c(0.000595000,0.000431667,0.001760833,0.002604167,0.000245000,0.000637500,0.002650833,0.000388333,0.002910000,0.001470833,0.003042500,0.000962500,0.000985833,0.001102500,0.003095833,0.003268333),
+  c(0.002679167,0.002709167,0.003037500,0.002426667,0.002905833,0.002453333,0.000171667,0.002500000,0.002527500,0.003309167,0.000140833,0.000609167,0.002739167,0.000093300,0.000142500,0.000170833),
+  c(0.002590000,0.002066667,0.002440000,0.002393333,0.002571667,0.002735000,0.002956667,0.002445833,0.002651667,0.002807500,0.002831667,0.002795833,0.002863333,0.002632500,0.000610833,0.003202500)
+)
+
+
+data <-  matrix(unlist(data), byrow = TRUE, ncol = length(cols), nrow = length(rows))
+
+colnames(data) <- states
+
+rownames(data) <-  drugs
+
+
+
+
+```
+
+
+```{r}
+ 
+
+
+```
+
+Our first model will be a simple CTMC assuming the SSWM regime, i.e. the population in a given instant is always monomorphic, the rates of transition are proportional to the difference in fitness (i.e. more fitted the new mutation less time is needed to ). We can only procede maximazing the fitness  
+
+```{r CTMC with SSWM reigme}
+source("utils.R")
+library(dplyr)
+
+# first we need to transform the matrix in a list of
+
+Q_list <- from_table_to_Q(data, model = "SSWM")
+
+init_state <- c(1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+
+transl_states <-  tibble(state = 1:16, mutations = states)
+
+final_time <- sapply(Q_list, function(x) probabilityatT(x,10000,1))
+
+abs_states_num <- apply(final_time,2, function(x) which(x > 0.001) )
+
+abs_states <-  sapply(abs_states_num, function(x) states[x])
+
+final_entropy <- apply(final_time, 2,  function(x) {
+    vec <- round(x,2)[which(round(x,2) > 0)]
+    res <- -sum(vec * log(vec))
+    return(res)
+  })
+
+simulations <- lapply(Q_list, function(x) multi_sim_CTC(x,init_state,1e6))
+simulations <- lapply(simulations, function(x) {
+  res <- as_tibble(do.call(what = rbind, x))
+  colnames(res) <- c("state", "time")
+  return(res)
+  })
+
+sim_times <- mapply(simulations, abs_states_num,FUN = function(x,y) mean_abs_time_fromSM(x,y,transl_states), SIMPLIFY = F)
+
+
+```
+
+
+
+
+```{r plots part1}
+library(ggplot2)
+
+drugs_on_abs <- drugs[order(nstates)]
+drugs_on_abs <-  factor(drugs_on_abs, levels = (drugs_on_abs))
+
+nstates <- sapply(abs_states, length)
+
+ABS_states <-  factor(nstates)[order(nstates)]
+
+qplot(y = final_entropy[order(nstates)], x = factor(drugs_on_abs), color = ABS_states, xlab = "Drug", ylab = "Entropy" )
+
+n_abs <- sapply(sim_times, nrow)
+
+factor_drug <- rep(names(n_abs), n_abs)
+
+times_table <- cbind(do.call(rbind, sim_times), drug = factor_drug)
+
+rownames(times_table) <-  NULL
+
+ggplot(aes(y = mean, x = drug, color = mutations , ymin=times_table$mean - sqrt(times_table$var), ymax=times_table$mean + sqrt(times_table$var)), data = times_table) + geom_point() + geom_pointrange()
+
+print.xtable(xtable(times_table), file = "./time_table1.txt")
+
+```
+
+```{r CTMC part 2 and 3}
+
+final_time_mat <- lapply(Q_list, function(x) probabilityatT(x,10000))
+
+commuting <- calculate_commutativity(final_time_mat, init_state)
+
+sens_res <-  calculate_coll_sens_res(final_time_mat, init_state,data)
+
+
+```
+
+
+```{r plots part 2 and 3}
+library(pheatmap)
+
+numeric_commuting <- apply(commuting, c(1,2), as.numeric)
+
+pheatmap(numeric_commuting, legend = F)
+
+pheatmap(sens_res, cluster_rows = F, cluster_cols = F)
+
+
+```
+
+```{r CTMC part 4}
+bd_1 <- calculate_best_drugs_1(final_time_mat, init_state,data)
+
+bd_2 <-  calculate_best_drugs_2(final_time_mat, init_state,data)
+
+bd_3 <- calculate_best_drugs_3(final_time_mat, init_state,data)
+
+```
+
+```{r plots part 4}
+
+bd_1[,2] <- bd_1[,2] * 100000
+bd_2[,2] <- bd_2[,2] * 100000
+bd_3[,2] <- bd_3[,2] * 100000
+
+table_bd <-  cbind(bd_1[1:10,], bd_2[1:10,], bd_3[1:10,])
+
+print.xtable(xtable(table_bd), file = "./bd_table.txt")
+
+```
+
+```{r WF}
+
+mut_matrix <- generate_mut_matrix(states, mut_rate = 10^-4)
+
+
+res_WT <- lapply(c(10^6,10^7,10^8,10^9), function(x) WF(states, mut_matrix, fitness = selection_coeff(data[1,]), N = 500, P = x))
+
+```
+
+
+```{r plots PCTMC}
+library(gridExtra)
+
+res_WT_flat <-  lapply(res_WT, function(x) reshape2::melt(x))
+ps <-  lapply(res_WT_flat,function(x) ggplot(data =  x, aes(x = Var2, y = value, color = paste(Var1))) + geom_line() + xlab("generation") + ylab("proportions") + scale_color_discrete("genotype")  )
+
+ggpubr::ggarrange(ps[[1]], ps[[2]], ps[[3]], ps[[4]], common.legend = T)
+```
+
