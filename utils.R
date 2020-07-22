@@ -269,7 +269,7 @@ selection_coeff <- function(fitt) {
 
   yy <-  max(fitt)
 
-  return((fitt / yy) - 0.6)
+  return((fitt / yy) - 0.65)
 }
 
 WF <- function(genotypes, mutation_matrix, fitness, N = 1000, P = 10^8, init_state = 1) {
@@ -280,11 +280,10 @@ WF <- function(genotypes, mutation_matrix, fitness, N = 1000, P = 10^8, init_sta
   N_s[1,1] <- 1
   for(i in seq_len(N) + 1){
    probs <-  generate_WF_probs(P_s[,i-1], genotypes, mutation_matrix, fitness)
-   samples <-  rbinom(length(probs), size = P, prob = probs / sum(probs))
-   #P <-  sum(samples)
-   N_s[,i] <-  samples / P
+   samples <-  rmultinom(1, size = P, prob = probs)
+   N_s[,i] <-  probs
 
-   P_s[,i] <-  N_s[,i] * P
+   P_s[,i] <-  samples
   }
   colnames(N_s) <- paste0(0:N)
   rownames(N_s) <- genotypes

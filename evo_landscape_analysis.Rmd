@@ -163,16 +163,16 @@ bd_3[,2] <- bd_3[,2] * 100000
 
 table_bd <-  cbind(bd_1[1:10,], bd_2[1:10,], bd_3[1:10,])
 
-print.xtable(xtable(table_bd), file = "./bd_table.txt")
+print.xtable(xtable(table_bd), file = "./bd_table.txt", include.rownames = F)
 
 ```
 
 ```{r WF}
 
-mut_matrix <- generate_mut_matrix(states, mut_rate = 10^-4)
+mut_matrix <- generate_mut_matrix(states, mut_rate = 10^-8)
 
 
-res_WT <- lapply(c(10^6,10^7,10^8,10^9), function(x) WF(states, mut_matrix, fitness = selection_coeff(data[1,]), N = 500, P = x))
+res_WT <- lapply(c(10^6,10^7,10^8,10^9), function(x) WF(states, mut_matrix, fitness = selection_coeff(data[2,]), N = 600, P = x))
 
 ```
 
